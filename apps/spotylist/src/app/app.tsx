@@ -1,12 +1,16 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import styles from './app.module.scss';
-
-import NxWelcome from './nx-welcome';
 
 export function App() {
+  const onLoginClicked = async () => {
+    fetch(`${process.env.API_BASE_URL}/login`)
+      .then()
+      .catch((reject) => {
+        console.log('rejected', reject);
+      });
+  };
+
   return (
-    <div>
-      <NxWelcome title="spotylist" />
+    <div className="App">
     </div>
   );
 }

@@ -1,1 +1,51 @@
 /* You can add global styles to this file, and also import other style files */
+// Grid
+//colores y fuente
+body {
+  font-family: Arial, sans-serif;
+}
+
+:root {
+  --primary-color: #1db954; /* Verde principal */
+  --secondary-color: #191414; /* Negro secundario */
+  --text-color: #ffffff; /* Color del texto */
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(200px, 1fr)
+  ); /* Define las columnas de la cuadrícula */
+  grid-gap: 10px; /* Espacio entre los elementos */
+  justify-items: center; /* Centra los elementos horizontalmente */
+  align-items: center; /* Centra los elementos verticalmente */
+  max-width: 100%; /* Ocupa el ancho completo de su contenedor */
+  margin: 0 auto; /* Centra el contenedor en pantalla si el ancho es menor al 100% */
+}
+
+.grid-item {
+  max-width: 100%; /* Asegura que las imágenes no superen el ancho del contenedor */
+}
+
+.grid-item img {
+  max-width: 100%; /* Asegura que las imágenes no superen el ancho del contenedor */
+  height: auto; /* Asegura que las imágenes mantengan su relación de aspecto */
+}
+
+/* Botones habilitados */
+.button {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+/* Botones deshabilitados */
+.button.disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+}
