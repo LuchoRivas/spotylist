@@ -79,3 +79,82 @@ export interface SpotifyResponse {
   refresh_token: string;
   user: SpotifyUser;
 }
+
+export interface SpotifyPlaylistTrackResponse {
+  href: string;
+  items: SpotifyTrackItem[];
+  limit: number;
+  next: string | null;
+  offset: number;
+  previous: string | null;
+  total: number;
+}
+
+interface SpotifyTrackItem {
+  added_at: string;
+  added_by: SpotifyUser;
+  is_local: boolean;
+  primary_color: string | null;
+  track: SpotifyTrack;
+  video_thumbnail: {
+    url: string | null;
+  };
+}
+
+interface SpotifyTrack {
+  album: SpotifyAlbum;
+  artists: SpotifyArtist[];
+  available_markets: string[];
+  external_urls: {
+    spotify: string;
+  };
+  href: string;
+  id: string;
+  is_local: boolean;
+  name: string;
+  popularity: number;
+  preview_url: string | null;
+  track: boolean;
+  track_number: number;
+  type: string;
+  uri: string;
+  duration_ms: number;
+  episode: boolean;
+  explicit: boolean;
+  external_ids: {
+    isrc: string;
+  };
+}
+
+interface SpotifyAlbum {
+  album_type: string;
+  artists: SpotifyArtist[];
+  available_markets: string[];
+  external_urls: {
+    spotify: string;
+  };
+  href: string;
+  id: string;
+  images: {
+    height: number;
+    url: string;
+    width: number;
+  }[];
+  name: string;
+  release_date: string;
+  release_date_precision: string;
+  total_tracks: number;
+  type: string;
+  uri: string;
+}
+
+interface SpotifyArtist {
+  external_urls: {
+    spotify: string;
+  };
+  href: string;
+  id: string;
+  name: string;
+  type: string;
+  uri: string;
+}

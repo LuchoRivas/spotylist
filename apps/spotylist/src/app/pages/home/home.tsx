@@ -1,7 +1,7 @@
+import apiClient from 'common/src/lib/api-client';
 import { SpotifyPlaylist } from 'common/src/lib/ts/spotify-web-api';
 import { useState } from 'react';
 import { useAuth } from '../../auth-context';
-import apiClient from '../../utils/api-client';
 
 interface ServerResponse {
   authUrl: string;
@@ -16,7 +16,7 @@ function Home() {
   const onLoginClicked = async () => {
     apiClient
       .get('login')
-      .then(async (resp) => {
+      .then(async (resp: any) => {
         if (resp.status === 200) {
           const { authUrl }: ServerResponse = await resp.data;
           if (authUrl) window.location.href = authUrl;
@@ -24,7 +24,7 @@ function Home() {
           console.log('Error en la respuesta del servidor');
         }
       })
-      .catch((reject) => {
+      .catch((reject: any) => {
         console.log('rejected', reject);
       });
   };
@@ -33,7 +33,7 @@ function Home() {
     if (!accessToken || !appUser) return;
     apiClient
       .get('user-playlists', { params: { userId: appUser.id } })
-      .then(async (response) => {
+      .then(async (response: any) => {
         if (response.status === 200) {
           const { playlists } = await response.data;
           setUserPlaylists(playlists);
@@ -42,13 +42,27 @@ function Home() {
           console.log('Error en la respuesta del servidor');
         }
       })
-      .catch((reject) => {
+      .catch((reject: any) => {
         console.log('rejected', reject);
       });
   };
 
   const onPlaylistClicked = (playlistId: string) => {
     console.log('PL id', playlistId);
+    apiClient
+      .get('playlist-tracks', { params: { playlistId } })
+      .then(async (response: any) => {
+        if (response.status === 200) {
+          const { playlists } = await response.data;
+          setUserPlaylists(playlists);
+          console.log('data: SpotifyPlaylist', playlists);
+        } else {
+          console.log('Error en la respuesta del servidor');
+        }
+      })
+      .catch((reject: any) => {
+        console.log('rejected', reject);
+      });
   };
 
   return (
@@ -83,7 +97,7 @@ function Home() {
               Cargar mis playlists
             </button>
             {userPlaylists && (
-              <div className='grid-container'>
+              <div className="grid-container">
                 {userPlaylists.map((userPlaylist) => (
                   <div
                     className="grid-item"
@@ -97,8 +111,10 @@ function Home() {
                           ? userPlaylist.images[1].url
                           : userPlaylist.images[0].url
                       }
-                      alt=""
+                      alt={`${userPlaylist.id}-pl-cover`}
                     />
+
+                    <span>{`${userPlaylist.tracks.total} tracks`}</span>
                   </div>
                 ))}
               </div>

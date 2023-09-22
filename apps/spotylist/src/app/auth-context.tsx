@@ -1,11 +1,13 @@
-import { SpotifyUser } from "@spotylist/common";
+import { SpotifyUser } from '@spotylist/common';
+import { AxiosResponse } from 'axios';
+import apiClient, { setAuthTokenHeader } from 'common/src/lib/api-client';
 import React, {
   createContext,
   useContext,
   useState,
   ReactNode,
   useEffect,
-} from "react";
+} from 'react';
 
 interface AppAuth {
   accessToken: string | null;
@@ -30,11 +32,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   // Utilizamos useEffect para cargar los tokens desde sessionStorage cuando se monta el componente.
   useEffect(() => {
-    const storedAccessToken = sessionStorage.getItem("access_token");
-    const storedRefreshToken = sessionStorage.getItem("refresh_token");
-    const storedApplicationUser = sessionStorage.getItem("app_user");
+    const storedAccessToken = sessionStorage.getItem('access_token');
+    const storedRefreshToken = sessionStorage.getItem('refresh_token');
+    const storedApplicationUser = sessionStorage.getItem('app_user');
 
     if (storedAccessToken && storedRefreshToken) {
+      setAuthTokenHeader(storedAccessToken)
       setAccessTokenStore(storedAccessToken);
       setRefreshTokenStore(storedRefreshToken);
       setAppUserStore(
@@ -46,10 +49,29 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   // Utilizamos useEffect para almacenar los tokens en sessionStorage cuando cambian.
   useEffect(() => {
     if (accessToken && refreshToken) {
-      sessionStorage.setItem("access_token", accessToken);
-      sessionStorage.setItem("refresh_token", refreshToken);
-      sessionStorage.setItem("app_user", JSON.stringify(appUser));
+      sessionStorage.setItem('access_token', accessToken);
+      sessionStorage.setItem('refresh_token', refreshToken);
+      sessionStorage.setItem('app_user', JSON.stringify(appUser));
     }
+    apiClient.interceptors.response.use(
+      (response: AxiosResponse) => response,
+      async (error) => {
+        if (error.response && error.response.status === 401) {
+          const refresh_token = sessionStorage.getItem('refresh_token');
+          const { data, status } = await apiClient.get('refresh_token', {
+            params: { refresh_token },
+          });
+          if (status === 200) {
+            const { access_token } = data;
+            setAccessTokenStore(access_token)
+            setAuthTokenHeader(access_token);
+          }
+          // solicitud original con el nuevo token
+          return apiClient(error.config);
+        }
+        return Promise.reject(error);
+      }
+    );
   }, [accessToken, refreshToken, appUser]);
 
   const setAccessToken = (token: string | null) => {
@@ -83,7 +105,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useTokens must be used within a TokenProvider");
+    throw new Error('useTokens must be used within a TokenProvider');
   }
   return context;
 };
