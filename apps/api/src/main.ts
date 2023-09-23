@@ -172,7 +172,7 @@ app.get('/user-playlists', (req: any, res: any) => {
 app.get('/playlist-tracks', (req: any, res: any) => {
   try {
     const { playlistId } = req.query || '';
-    const fetchPlaylist = () => {
+    const fetchPlaylisttracks = () => {
       const options = {
         url: `${spotifyAPIBaseUrl}/playlists/${playlistId}/tracks`,
         headers: { Authorization: req.headers.authorization },
@@ -184,12 +184,24 @@ app.get('/playlist-tracks', (req: any, res: any) => {
         (error, response, playlistTracks: SpotifyPlaylistTrackResponse) => {
           if (!error && response.statusCode === 200) {
             // Manage tracks response playlistTracks
+            const { items, total, next, href } = playlistTracks
+            res.status(200).json({ items, total, next, href });
           }
-          res.status(200).json({ message: 'playlist-tracks endpoint' });
+          else if (
+            playlistTracks.error?.status === 401 &&
+            playlistTracks.error?.message === 'The access token expired'
+          ) {
+            // Token de acceso expirado
+            res.status(401).json({ error: 'Token expired' });
+          } else {
+            // Manejar errores de la solicitud a la API de Spotify
+            res.status(response.statusCode || 500).json({ Error: error });
+            console.error(error);
+          }
         }
       );
     };
-    fetchPlaylist();
+    fetchPlaylisttracks();
   } catch (error) {
     res.status(500).json({ Error: error });
     console.error(error);
