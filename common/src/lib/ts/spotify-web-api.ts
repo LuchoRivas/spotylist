@@ -88,9 +88,10 @@ export interface SpotifyPlaylistTrackResponse {
   offset: number;
   previous: string | null;
   total: number;
+  error?: SpotifyError;
 }
 
-interface SpotifyTrackItem {
+export interface SpotifyTrackItem {
   added_at: string;
   added_by: SpotifyUser;
   is_local: boolean;
