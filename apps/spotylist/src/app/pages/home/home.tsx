@@ -154,7 +154,7 @@ function Home() {
                     <th>Álbum</th>
                   </tr>
                   {playlist.items.map((playlistItem) => (
-                    <tr>
+                    <tr key={playlistItem.track.id}>
                       <td>
                         {playlistItem.track.artists
                           .map((artist) => artist.name)

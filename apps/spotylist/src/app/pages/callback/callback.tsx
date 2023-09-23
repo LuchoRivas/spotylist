@@ -18,20 +18,17 @@ function Callback() {
           },
         });
         const data: SpotifyResponse = await response.data;
-
         if (data.access_token && data.refresh_token) {
           setAuthTokenHeader(data.access_token);
           setAccessToken(data.access_token);
           setRefreshToken(data.refresh_token);
           setAppUser(data.user);
-          navigate('/');
         }
       } catch (error) {
         console.error('Error al enviar los parámetros a la API:', error);
-        navigate('/404');
       }
     },
-    [setAccessToken, setRefreshToken, setAppUser, navigate]
+    [setAccessToken, setRefreshToken, setAppUser]
   );
 
   useEffect(() => {
@@ -41,14 +38,22 @@ function Callback() {
       const state = searchParams.get('state');
 
       if (code && state) {
-        await fetchDataFromAPI(code, state);
+        fetchDataFromAPI(code, state)
+          .then((res) => {
+            navigate('/');
+          })
+          .catch((err) => {
+            console.log('fetchDataFromAPI error', err);
+            navigate('/404');
+          })
+          .finally();
       } else {
         console.error(
           'Los parámetros "code" y/o "state" no están presentes en la URL.'
         );
       }
     })();
-  }, [fetchDataFromAPI, location]);
+  }, []);
 
   return (
     <div>
