@@ -1,10 +1,8 @@
 import apiClient from 'common/src/lib/api-client';
 import { SpotifyPlaylist } from 'common/src/lib/ts/spotify-web-api';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useAuth } from '../../auth-context';
 import { Playlist, PlaylistTrackApiResponse } from '@spotylist/common';
-
-
 
 function Home() {
   const { accessToken, appUser } = useAuth();
@@ -13,23 +11,21 @@ function Home() {
   );
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
 
-  const onLoginClicked = async () => {
-    apiClient
-      .get('login')
-      .then(async (resp: any) => {
-        if (resp.status === 200) {
-          const { authUrl }: { authUrl: string } = await resp.data;
-          if (authUrl) window.location.href = authUrl;
-        } else {
-          console.log('Error en la respuesta del servidor');
-        }
-      })
-      .catch((reject: any) => {
-        console.log('rejected(login)', reject);
-      });
-  };
+  const onLoginClicked = useCallback(async () => {
+    try {
+      const resp = await apiClient.get('login');
+      if (resp.status === 200) {
+        const { authUrl }: { authUrl: string } = await resp.data;
+        if (authUrl) window.location.href = authUrl;
+      } else {
+        console.log('Error en la respuesta del servidor');
+      }
+    } catch (error) {
+      console.log('Error:', error);
+    }
+  }, []); // Dependencias vacías, o puedes agregar dependencias si es necesario
 
-  const onLoadMyPlaylistsClicked = async () => {
+  const onLoadMyPlaylistsClicked = useCallback(async () => {
     if (!accessToken || !appUser) return;
     apiClient
       .get('user-playlists', { params: { userId: appUser.id } })
@@ -46,31 +42,43 @@ function Home() {
       .catch((reject: any) => {
         console.log('rejected(user-playlists)', reject);
       });
-  };
+  }, []);
 
-  const onPlaylistClicked = ({
-    playlistId,
-    name,
-    imageUrl,
-  }: {
-    playlistId: string;
-    name: string;
-    imageUrl: string;
-  }) => {
-    apiClient
-      .get('playlist-tracks', { params: { playlistId } })
-      .then(async (response: any) => {
-        if (response.status === 200) {
-          const { items, total, next, href } = await response.data as PlaylistTrackApiResponse;
-          setPlaylist({ items, total, next, href, playlistId, name, imageUrl });
-        } else {
-          console.log('Error en la respuesta del servidor');
-        }
-      })
-      .catch((reject: any) => {
-        console.log('rejected(playlist-tracks)', reject);
-      });
-  };
+  const onPlaylistClicked = useCallback(
+    ({
+      playlistId,
+      name,
+      imageUrl,
+    }: {
+      playlistId: string;
+      name: string;
+      imageUrl: string;
+    }) => {
+      apiClient
+        .get('playlist-tracks', { params: { playlistId } })
+        .then(async (response: any) => {
+          if (response.status === 200) {
+            const { items, total, next, href } =
+              (await response.data) as PlaylistTrackApiResponse;
+            setPlaylist({
+              items,
+              total,
+              next,
+              href,
+              playlistId,
+              name,
+              imageUrl,
+            });
+          } else {
+            console.log('Error en la respuesta del servidor');
+          }
+        })
+        .catch((reject: any) => {
+          console.log('rejected(playlist-tracks)', reject);
+        });
+    },
+    []
+  );
 
   return (
     <div>
@@ -83,7 +91,9 @@ function Home() {
             flex: 1,
           }}
         >
-          <button className='button-rechoncho' onClick={onLoginClicked}>Login con Spotify</button>
+          <button className="button-rechoncho" onClick={() => onLoginClicked()}>
+            Login con Spotify
+          </button>
         </div>
       )}
       {accessToken && (
@@ -102,7 +112,7 @@ function Home() {
             {!playlist && (
               <div>
                 <span>Para comenzar presione en cargar playlists</span>
-                <button className='button' onClick={onLoadMyPlaylistsClicked}>
+                <button className="button" onClick={onLoadMyPlaylistsClicked}>
                   Cargar mis playlists
                 </button>
               </div>
@@ -143,7 +153,9 @@ function Home() {
                 <h3>{playlist.name}</h3>
                 <br />
 
-                <button className='button' onClick={() => setPlaylist(null)}>volver</button>
+                <button className="button" onClick={() => setPlaylist(null)}>
+                  volver
+                </button>
                 <br />
                 <br />
 
