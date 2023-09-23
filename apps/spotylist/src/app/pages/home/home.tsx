@@ -2,30 +2,30 @@ import apiClient from 'common/src/lib/api-client';
 import { SpotifyPlaylist } from 'common/src/lib/ts/spotify-web-api';
 import { useState } from 'react';
 import { useAuth } from '../../auth-context';
+import { Playlist, PlaylistTrackApiResponse } from '@spotylist/common';
 
-interface ServerResponse {
-  authUrl: string;
-}
+
 
 function Home() {
   const { accessToken, appUser } = useAuth();
   const [userPlaylists, setUserPlaylists] = useState<SpotifyPlaylist[] | null>(
     null
   );
+  const [playlist, setPlaylist] = useState<Playlist | null>(null);
 
   const onLoginClicked = async () => {
     apiClient
       .get('login')
       .then(async (resp: any) => {
         if (resp.status === 200) {
-          const { authUrl }: ServerResponse = await resp.data;
+          const { authUrl }: { authUrl: string } = await resp.data;
           if (authUrl) window.location.href = authUrl;
         } else {
           console.log('Error en la respuesta del servidor');
         }
       })
       .catch((reject: any) => {
-        console.log('rejected', reject);
+        console.log('rejected(login)', reject);
       });
   };
 
@@ -37,31 +37,38 @@ function Home() {
         if (response.status === 200) {
           const { playlists } = await response.data;
           setUserPlaylists(playlists);
-          console.log('data: SpotifyPlaylist', playlists);
+          // DEBUG PLAYLIST
+          // console.log('data: SpotifyPlaylist', playlists);
         } else {
           console.log('Error en la respuesta del servidor');
         }
       })
       .catch((reject: any) => {
-        console.log('rejected', reject);
+        console.log('rejected(user-playlists)', reject);
       });
   };
 
-  const onPlaylistClicked = (playlistId: string) => {
-    console.log('PL id', playlistId);
+  const onPlaylistClicked = ({
+    playlistId,
+    name,
+    imageUrl,
+  }: {
+    playlistId: string;
+    name: string;
+    imageUrl: string;
+  }) => {
     apiClient
       .get('playlist-tracks', { params: { playlistId } })
       .then(async (response: any) => {
         if (response.status === 200) {
-          const { playlists } = await response.data;
-          setUserPlaylists(playlists);
-          console.log('data: SpotifyPlaylist', playlists);
+          const { items, total, next, href } = await response.data as PlaylistTrackApiResponse;
+          setPlaylist({ items, total, next, href, playlistId, name, imageUrl });
         } else {
           console.log('Error en la respuesta del servidor');
         }
       })
       .catch((reject: any) => {
-        console.log('rejected', reject);
+        console.log('rejected(playlist-tracks)', reject);
       });
   };
 
@@ -76,7 +83,7 @@ function Home() {
             flex: 1,
           }}
         >
-          <button onClick={onLoginClicked}>Login con Spotify</button>
+          <button className='button-rechoncho' onClick={onLoginClicked}>Login con Spotify</button>
         </div>
       )}
       {accessToken && (
@@ -92,17 +99,29 @@ function Home() {
             <div>Hola {appUser?.display_name}</div>
           </header>
           <div>
-            <span>Para comenzar presione en cargar playlists</span>
-            <button onClick={onLoadMyPlaylistsClicked}>
-              Cargar mis playlists
-            </button>
-            {userPlaylists && (
+            {!playlist && (
+              <div>
+                <span>Para comenzar presione en cargar playlists</span>
+                <button className='button' onClick={onLoadMyPlaylistsClicked}>
+                  Cargar mis playlists
+                </button>
+              </div>
+            )}
+            {userPlaylists && !playlist && (
               <div className="grid-container">
                 {userPlaylists.map((userPlaylist) => (
                   <div
                     className="grid-item"
                     key={userPlaylist.id}
-                    onClick={() => onPlaylistClicked(userPlaylist.id)}
+                    onClick={() =>
+                      onPlaylistClicked({
+                        playlistId: userPlaylist.id,
+                        name: userPlaylist.name,
+                        imageUrl: userPlaylist.images[1]
+                          ? userPlaylist.images[1].url
+                          : userPlaylist.images[0].url,
+                      })
+                    }
                   >
                     <span>{userPlaylist.name}</span>
                     <img
@@ -117,6 +136,35 @@ function Home() {
                     <span>{`${userPlaylist.tracks.total} tracks`}</span>
                   </div>
                 ))}
+              </div>
+            )}
+            {playlist && (
+              <div>
+                <h3>{playlist.name}</h3>
+                <br />
+
+                <button className='button' onClick={() => setPlaylist(null)}>volver</button>
+                <br />
+                <br />
+
+                <table>
+                  <tr>
+                    <th>Artistas</th>
+                    <th>Canción</th>
+                    <th>Álbum</th>
+                  </tr>
+                  {playlist.items.map((playlistItem) => (
+                    <tr>
+                      <td>
+                        {playlistItem.track.artists
+                          .map((artist) => artist.name)
+                          .join(', ')}
+                      </td>
+                      <td>{playlistItem.track.name}</td>
+                      <td>{playlistItem.track.album.name}</td>
+                    </tr>
+                  ))}
+                </table>
               </div>
             )}
           </div>

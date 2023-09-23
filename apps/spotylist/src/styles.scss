@@ -2,13 +2,9 @@
 // Grid
 //colores y fuente
 body {
-  font-family: Arial, sans-serif;
-}
-
-:root {
-  --primary-color: #1db954; /* Verde principal */
-  --secondary-color: #191414; /* Negro secundario */
-  --text-color: #ffffff; /* Color del texto */
+  font-family: 'Helvetica Neue', sans-serif; /* Cambia la fuente a la que desees utilizar */
+  background-color: rgba(0, 0, 0, 0.9);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .grid-container {
@@ -35,12 +31,8 @@ body {
 
 /* Botones habilitados */
 .button {
-  background-color: var(--primary-color);
-  color: var(--text-color);
-  padding: 10px 20px;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
+  background-color: rgba(25, 20, 20, 0.9); /* Negro con 90% de opacidad */
+  color: rgba(255, 255, 255, 0.9); /* Blanco con 90% de opacidad */
 }
 
 /* Botones deshabilitados */
@@ -49,3 +41,42 @@ body {
   color: #666;
   cursor: not-allowed;
 }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border-bottom: 1px solid #ccc;
+  padding: 8px;
+}
+
+tr:hover td {
+  background-color: rgba(255, 255, 255, 0.15); /* Color de acentuación al pasar el cursor */
+}
+
+.button-rechoncho {
+  display: inline-block;
+  padding: 15px 40px;
+  background-color: rgba(29, 185, 84, 0.9); /* Verde con 90% de opacidad */
+  color: rgba(255, 255, 255, 0.9); /* Blanco con 90% de opacidad */
+  font-family: 'Helvetica Neue', sans-serif; /* Cambia la fuente a la que desees utilizar */
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 50px; /* Borde redondeado */
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.button-rechoncho:hover {
+  background-color: rgba(20, 140, 64, 0.9); /* Cambiar el color al pasar el ratón */
+  transform: scale(1.01); /* Efecto de escala al pasar el ratón */
+}
+
+// tr:nth-child(even) td {
+//   background-color: #f2f2f2; /* Color gris claro para filas pares */
+// }
