@@ -1,13 +1,8 @@
-import { setAuthTokenHeader, SpotifyResponse } from "@spotylist/common";
-import apiClient from "common/src/lib/api-client";
-import { useCallback, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../../auth-context";
-
-// interface ServerResponse {
-//   access_token: string;
-//   refresh_token: string;
-// }
+import { setAuthTokenHeader, SpotifyResponse } from '@spotylist/common';
+import apiClient from 'common/src/lib/api-client';
+import { useCallback, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../auth-context';
 
 function Callback() {
   const location = useLocation();
@@ -16,7 +11,7 @@ function Callback() {
   const fetchDataFromAPI = useCallback(
     async (code: string, state: string) => {
       try {
-        const response = await apiClient.get("callback", {
+        const response = await apiClient.get('callback', {
           params: {
             code,
             state,
@@ -29,10 +24,11 @@ function Callback() {
           setAccessToken(data.access_token);
           setRefreshToken(data.refresh_token);
           setAppUser(data.user);
-          navigate("/");
+          navigate('/');
         }
       } catch (error) {
-        console.error("Error al enviar los parámetros a la API:", error);
+        console.error('Error al enviar los parámetros a la API:', error);
+        navigate('/404');
       }
     },
     [setAccessToken, setRefreshToken, setAppUser, navigate]
@@ -41,8 +37,8 @@ function Callback() {
   useEffect(() => {
     (async () => {
       const searchParams = new URLSearchParams(location.search);
-      const code = searchParams.get("code");
-      const state = searchParams.get("state");
+      const code = searchParams.get('code');
+      const state = searchParams.get('state');
 
       if (code && state) {
         await fetchDataFromAPI(code, state);
