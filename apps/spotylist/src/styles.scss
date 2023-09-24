@@ -69,12 +69,10 @@ tr:hover td {
   text-align: center;
   text-decoration: none;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .button-rechoncho:hover {
   background-color: rgba(20, 140, 64, 0.9); /* Cambiar el color al pasar el ratón */
-  transform: scale(1.01); /* Efecto de escala al pasar el ratón */
 }
 
 // tr:nth-child(even) td {

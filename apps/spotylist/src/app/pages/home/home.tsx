@@ -23,7 +23,7 @@ function Home() {
     } catch (error) {
       console.log('Error:', error);
     }
-  }, []); // Dependencias vacías, o puedes agregar dependencias si es necesario
+  }, []);
 
   const onLoadMyPlaylistsClicked = useCallback(async () => {
     if (!accessToken || !appUser) return;
@@ -89,11 +89,12 @@ function Home() {
             justifyContent: 'center',
             alignSelf: 'center',
             flex: 1,
+            zIndex: 9999
           }}
         >
-          <button className="button-rechoncho" onClick={() => onLoginClicked()}>
+          <span className="button-rechoncho" onClick={onLoginClicked}>
             Login con Spotify
-          </button>
+          </span>
         </div>
       )}
       {accessToken && (
