@@ -9,6 +9,7 @@ import {
   SpotifyPlaylist,
   SpotifyPlaylistResponse,
   SpotifyPlaylistTrackResponse,
+  SpotifyTrackItem,
 } from '@spotylist/common';
 
 const app = express();
@@ -171,10 +172,13 @@ app.get('/user-playlists', (req: any, res: any) => {
 
 app.get('/playlist-tracks', (req: any, res: any) => {
   try {
+    let offset = 0;
     const { playlistId } = req.query || '';
-    const fetchPlaylisttracks = () => {
+    const allPlaylistTracks: SpotifyTrackItem[] = [];
+
+    const fetchPlaylistTracks = () => {
       const options = {
-        url: `${spotifyAPIBaseUrl}/playlists/${playlistId}/tracks`,
+        url: `${spotifyAPIBaseUrl}/playlists/${playlistId}/tracks?offset=${offset}`,
         headers: { Authorization: req.headers.authorization },
         json: true,
       };
@@ -183,11 +187,17 @@ app.get('/playlist-tracks', (req: any, res: any) => {
         options,
         (error, response, playlistTracks: SpotifyPlaylistTrackResponse) => {
           if (!error && response.statusCode === 200) {
-            // Manage tracks response playlistTracks
-            const { items, total, next, href } = playlistTracks
-            res.status(200).json({ items, total, next, href });
-          }
-          else if (
+            allPlaylistTracks.push(...playlistTracks.items);
+            if (playlistTracks.next) {
+              offset += 100;
+              fetchPlaylistTracks();
+            } else {
+              const { total, next, href } = playlistTracks;
+              res
+                .status(200)
+                .json({ items: allPlaylistTracks, total, next, href });
+            }
+          } else if (
             playlistTracks.error?.status === 401 &&
             playlistTracks.error?.message === 'The access token expired'
           ) {
@@ -201,7 +211,8 @@ app.get('/playlist-tracks', (req: any, res: any) => {
         }
       );
     };
-    fetchPlaylisttracks();
+
+    fetchPlaylistTracks();
   } catch (error) {
     res.status(500).json({ Error: error });
     console.error(error);
