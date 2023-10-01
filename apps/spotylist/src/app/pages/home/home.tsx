@@ -25,7 +25,7 @@ function Home() {
     }
   }, []);
 
-  const onLoadMyPlaylistsClicked = useCallback(async () => {
+  const onLoadMyPlaylistsClicked = async () => {
     if (!accessToken || !appUser) return;
     apiClient
       .get('user-playlists', { params: { userId: appUser.id } })
@@ -42,7 +42,7 @@ function Home() {
       .catch((reject: any) => {
         console.log('rejected(user-playlists)', reject);
       });
-  }, []);
+  };
 
   const onPlaylistClicked = useCallback(
     ({
@@ -89,7 +89,6 @@ function Home() {
             justifyContent: 'center',
             alignSelf: 'center',
             flex: 1,
-            zIndex: 9999
           }}
         >
           <span className="button-rechoncho" onClick={onLoginClicked}>
@@ -166,17 +165,19 @@ function Home() {
                     <th>Canción</th>
                     <th>Álbum</th>
                   </tr>
-                  {playlist.items.map((playlistItem) => (
-                    <tr key={playlistItem.track.id}>
-                      <td>
-                        {playlistItem.track.artists
-                          .map((artist) => artist.name)
-                          .join(', ')}
-                      </td>
-                      <td>{playlistItem.track.name}</td>
-                      <td>{playlistItem.track.album.name}</td>
-                    </tr>
-                  ))}
+                  <tbody>
+                    {playlist.items.map((playlistItem) => (
+                      <tr key={playlistItem.track.id}>
+                        <td>
+                          {playlistItem.track.artists
+                            .map((artist) => artist.name)
+                            .join(', ')}
+                        </td>
+                        <td>{playlistItem.track.name}</td>
+                        <td>{playlistItem.track.album.name}</td>
+                      </tr>
+                    ))}
+                  </tbody>
                 </table>
               </div>
             )}
