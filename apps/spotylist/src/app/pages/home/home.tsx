@@ -160,23 +160,26 @@ function Home() {
                 <br />
 
                 <table>
-                  <tr>
-                    <th>Artistas</th>
-                    <th>Canción</th>
-                    <th>Álbum</th>
-                  </tr>
+                  <thead>
+                    <tr>
+                      <th>Artistas</th>
+                      <th>Canción</th>
+                      <th>Álbum</th>
+                    </tr>
+                  </thead>
                   <tbody>
-                    {playlist.items.map((playlistItem) => (
-                      <tr key={playlistItem.track.id}>
-                        <td>
-                          {playlistItem.track.artists
-                            .map((artist) => artist.name)
-                            .join(', ')}
-                        </td>
-                        <td>{playlistItem.track.name}</td>
-                        <td>{playlistItem.track.album.name}</td>
-                      </tr>
-                    ))}
+                    {playlist &&
+                      playlist.items.map((playlistItem, index) => (
+                        <tr key={`i${index}-row_${playlistItem.track.id}`}>
+                          <td>
+                            {playlistItem.track.artists
+                              .map((artist) => artist.name)
+                              .join(', ')}
+                          </td>
+                          <td>{playlistItem.track.name}</td>
+                          <td>{playlistItem.track.album.name}</td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>
