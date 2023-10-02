@@ -37,7 +37,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     const storedApplicationUser = sessionStorage.getItem('app_user');
 
     if (storedAccessToken && storedRefreshToken) {
-      setAuthTokenHeader(storedAccessToken)
+      setAuthTokenHeader(storedAccessToken);
       setAccessTokenStore(storedAccessToken);
       setRefreshTokenStore(storedRefreshToken);
       setAppUserStore(
@@ -57,16 +57,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       (response: AxiosResponse) => response,
       async (error) => {
         if (error.response && error.response.status === 401) {
+          error.config._retry = true;
           const refresh_token = sessionStorage.getItem('refresh_token');
           const { data, status } = await apiClient.get('refresh_token', {
             params: { refresh_token },
           });
           if (status === 200) {
             const { access_token } = data;
-            setAccessTokenStore(access_token)
+            setAccessTokenStore(access_token);
             setAuthTokenHeader(access_token);
+            apiClient.defaults.headers.common[
+              'Authorization'
+            ] = `Bearer ${access_token}`;
+            error.config.headers['Authorization'] = `Bearer ${access_token}`;
+            setAccessToken(access_token);
           }
-          // solicitud original con el nuevo token
           return apiClient(error.config);
         }
         return Promise.reject(error);
@@ -75,6 +80,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   }, [accessToken, refreshToken, appUser]);
 
   const setAccessToken = (token: string | null) => {
+    sessionStorage.setItem('access_token', token || 'null');
     setAccessTokenStore(token);
   };
 
@@ -105,7 +111,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useTokens must be used within a TokenProvider');
+    throw new Error('useAuth must be used within a TokenProvider');
   }
   return context;
 };
