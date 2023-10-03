@@ -1,6 +1,6 @@
 import apiClient from 'common/src/lib/api-client';
 import { SpotifyPlaylist } from 'common/src/lib/ts/spotify-web-api';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../auth-context';
 import { Playlist, PlaylistTrackApiResponse } from '@spotylist/common';
 
@@ -10,6 +10,7 @@ function Home() {
     null
   );
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
+  const [isHeaderSticky, setIsHeaderSticky] = useState(false);
 
   const onLoginClicked = useCallback(async () => {
     try {
@@ -80,6 +81,22 @@ function Home() {
     []
   );
 
+  const handleScroll = () => {
+    if (window.scrollY > 100) {
+      setIsHeaderSticky(true);
+    } else {
+      setIsHeaderSticky(false);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   return (
     <div>
       {!accessToken && (
@@ -98,20 +115,20 @@ function Home() {
       )}
       {accessToken && (
         <div>
-          <header
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              margin: 20,
-            }}
-          >
-            <div>Spotylist</div>
+          <header className={`sticky-header${isHeaderSticky ? ' sticky' : ''}`}>
+            <div>Listofy</div>
             <div>Hola {appUser?.display_name}</div>
+            {isHeaderSticky && (
+              <button
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              >
+                Volver Arriba
+              </button>
+            )}
           </header>
           <div>
             {!playlist && (
               <div>
-                <span>Para comenzar presione en cargar playlists</span>
                 <button className="button" onClick={onLoadMyPlaylistsClicked}>
                   Cargar mis playlists
                 </button>
