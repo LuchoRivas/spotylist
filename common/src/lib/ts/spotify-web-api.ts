@@ -100,6 +100,7 @@ export interface SpotifyTrackItem {
   video_thumbnail: {
     url: string | null;
   };
+  id: string;
 }
 
 interface SpotifyTrack {

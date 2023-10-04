@@ -1,8 +1,12 @@
 import apiClient from 'common/src/lib/api-client';
-import { SpotifyPlaylist } from 'common/src/lib/ts/spotify-web-api';
+import {
+  SpotifyPlaylist,
+  SpotifyTrackItem,
+} from 'common/src/lib/ts/spotify-web-api';
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../auth-context';
 import { Playlist, PlaylistTrackApiResponse } from '@spotylist/common';
+import PlaylistTable from '../../..//components/playlist-table/playlist-table';
 
 function Home() {
   const { accessToken, appUser } = useAuth();
@@ -34,8 +38,6 @@ function Home() {
         if (response.status === 200) {
           const { playlists } = await response.data;
           setUserPlaylists(playlists);
-          // DEBUG PLAYLIST
-          // console.log('data: SpotifyPlaylist', playlists);
         } else {
           console.log('Error en la respuesta del servidor');
         }
@@ -95,7 +97,16 @@ function Home() {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, [playlist]);
+
+  const onChangePlaylistOrder = useCallback(
+    (orderedPlaylist: SpotifyTrackItem[]) => {
+      if (!playlist) return;
+      const updatedOrder: Playlist = { ...playlist, items: orderedPlaylist };
+      setPlaylist(updatedOrder);
+    },
+    [playlist]
+  );
 
   return (
     <div>
@@ -150,7 +161,7 @@ function Home() {
                       })
                     }
                   >
-                    <span>{userPlaylist.name}</span>
+                    <strong>{userPlaylist.name}</strong>
                     <img
                       src={
                         userPlaylist.images[1]
@@ -175,30 +186,10 @@ function Home() {
                 </button>
                 <br />
                 <br />
-
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Artistas</th>
-                      <th>Canción</th>
-                      <th>Álbum</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {playlist &&
-                      playlist.items.map((playlistItem, index) => (
-                        <tr key={`i${index}-row_${playlistItem.track.id}`}>
-                          <td>
-                            {playlistItem.track.artists
-                              .map((artist) => artist.name)
-                              .join(', ')}
-                          </td>
-                          <td>{playlistItem.track.name}</td>
-                          <td>{playlistItem.track.album.name}</td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
+                <PlaylistTable
+                  onChange={onChangePlaylistOrder}
+                  playlist={playlist}
+                />
               </div>
             )}
           </div>

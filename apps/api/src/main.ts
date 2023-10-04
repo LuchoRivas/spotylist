@@ -192,10 +192,14 @@ app.get('/playlist-tracks', (req: any, res: any) => {
               offset += 100;
               fetchPlaylistTracks();
             } else {
+              const mappedItems: SpotifyTrackItem[] = allPlaylistTracks.map(
+                (playlistItem, index) => ({
+                  ...playlistItem,
+                  id: `track_${playlistItem.track.id}${index}`, // para dnd
+                })
+              );
               const { total, next, href } = playlistTracks;
-              res
-                .status(200)
-                .json({ items: allPlaylistTracks, total, next, href });
+              res.status(200).json({ items: mappedItems, total, next, href });
             }
           } else if (
             playlistTracks.error?.status === 401 &&

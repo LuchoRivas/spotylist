@@ -1,5 +1,4 @@
 /* You can add global styles to this file, and also import other style files */
-// Grid
 //colores y fuente
 body {
   font-family: 'Helvetica Neue', sans-serif; /* Cambia la fuente a la que desees utilizar */
@@ -8,6 +7,7 @@ body {
   margin: 0;
 }
 
+// Grid
 .grid-container {
   display: grid;
   grid-template-columns: repeat(
@@ -18,16 +18,19 @@ body {
   justify-items: center; /* Centra los elementos horizontalmente */
   align-items: center; /* Centra los elementos verticalmente */
   max-width: 100%; /* Ocupa el ancho completo de su contenedor */
+  padding: 0 12px;
   margin: 0 auto; /* Centra el contenedor en pantalla si el ancho es menor al 100% */
 }
 
 .grid-item {
-  max-width: 100%; /* Asegura que las imágenes no superen el ancho del contenedor */
+  cursor: pointer; /* Cursor */
+  max-width: 95%; /* Asegura que las imágenes no superen el ancho del contenedor */
 }
 
 .grid-item img {
   max-width: 100%; /* Asegura que las imágenes no superen el ancho del contenedor */
   height: auto; /* Asegura que las imágenes mantengan su relación de aspecto */
+  border-radius: 8px 8px 0 0; /* Bordes redondeados solo en la parte superior de la imagen */
 }
 
 /* Botones habilitados */
