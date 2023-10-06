@@ -1,5 +1,4 @@
-import { Playlist } from '@spotylist/common';
-import styles from './playlist-table.module.scss';
+import { Playlist, SpotifyTrackItem } from '@spotylist/common';
 import SongItem from '../song-item/song-item';
 import {
   DndContext,
@@ -18,7 +17,7 @@ import {
 /* eslint-disable-next-line */
 export interface PlaylistTableProps {
   playlist: Playlist;
-  onChange: any;
+  onChange: (orderedPlaylist: SpotifyTrackItem[]) => void;
 }
 
 export function PlaylistTable({ playlist, onChange }: PlaylistTableProps) {

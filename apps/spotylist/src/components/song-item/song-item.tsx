@@ -1,5 +1,4 @@
 import { SpotifyTrackItem } from '@spotylist/common';
-import styles from './song-item.module.scss';
 import { useSortable } from '@dnd-kit/sortable';
 
 /* eslint-disable-next-line */
@@ -8,7 +7,7 @@ export interface SongItemProps {
   index: number;
 }
 
-export function SongItem({ playlistTrack, index }: SongItemProps) {
+export function SongItem({ playlistTrack }: SongItemProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useSortable({ id: playlistTrack.id });
 
