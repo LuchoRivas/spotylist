@@ -7,32 +7,6 @@ body {
   margin: 0;
 }
 
-// Grid
-.grid-container {
-  display: grid;
-  grid-template-columns: repeat(
-    auto-fill,
-    minmax(200px, 1fr)
-  ); /* Define las columnas de la cuadrícula */
-  grid-gap: 10px; /* Espacio entre los elementos */
-  justify-items: center; /* Centra los elementos horizontalmente */
-  align-items: center; /* Centra los elementos verticalmente */
-  max-width: 100%; /* Ocupa el ancho completo de su contenedor */
-  padding: 0 12px;
-  margin: 0 auto; /* Centra el contenedor en pantalla si el ancho es menor al 100% */
-}
-
-.grid-item {
-  cursor: pointer; /* Cursor */
-  max-width: 95%; /* Asegura que las imágenes no superen el ancho del contenedor */
-}
-
-.grid-item img {
-  max-width: 100%; /* Asegura que las imágenes no superen el ancho del contenedor */
-  height: auto; /* Asegura que las imágenes mantengan su relación de aspecto */
-  border-radius: 8px 8px 0 0; /* Bordes redondeados solo en la parte superior de la imagen */
-}
-
 /* Botones habilitados */
 .button {
   background-color: rgba(25, 20, 20, 0.9); /* Negro con 90% de opacidad */
@@ -89,50 +63,4 @@ tr:hover td {
   ); /* Cambiar el color al pasar el ratón */
 }
 
-.sticky-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center; /* Centra verticalmente los elementos */
-  padding: 20px;
-  background-color: #1db954; /* Color de fondo similar a Spotify */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave */
-  transition: top 0.3s;
-  z-index: 1000;
-  position: relative;
-  color: white; /* Texto blanco */
-}
 
-.sticky-header.sticky {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  padding: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.sticky-header div:first-child {
-  font-size: 24px;
-  font-weight: bold;
-}
-
-.sticky-header div:last-child {
-  display: flex;
-  align-items: center;
-  color: white; /* Texto blanco */
-  font-weight: bold;
-}
-
-.sticky-header button {
-  background-color: #1db954; /* Color de fondo del botón */
-  color: white; /* Texto blanco */
-  border: none;
-  padding: 10px 20px;
-  margin-left: 20px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.sticky-header button:hover {
-  background-color: #179745; /* Color de fondo del botón al pasar el mouse */
-}

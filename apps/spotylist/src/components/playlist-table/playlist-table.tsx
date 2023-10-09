@@ -13,15 +13,26 @@ import {
   arrayMove,
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
+import { useEffect, useState } from 'react';
 
 /* eslint-disable-next-line */
 export interface PlaylistTableProps {
   playlist: Playlist;
-  onChange: (orderedPlaylist: SpotifyTrackItem[]) => void;
+  onDrag: (orderedPlaylist: SpotifyTrackItem[]) => void;
+  onChange: any;
 }
 
-export function PlaylistTable({ playlist, onChange }: PlaylistTableProps) {
-  
+export type SortColumn = 'artist' | 'song' | 'album';
+export type SortDirection = 'asc' | 'desc';
+
+export function PlaylistTable({
+  playlist,
+  onDrag,
+  onChange,
+}: PlaylistTableProps) {
+  const [sortedColumn, setSortedColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc'); // 'asc' o 'desc'
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -29,18 +40,31 @@ export function PlaylistTable({ playlist, onChange }: PlaylistTableProps) {
     })
   );
 
+  const handleSort = (columnName: SortColumn) => {
+    let newDirection: SortDirection = 'asc';
+
+    if (sortedColumn === columnName) {
+      newDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+    }
+
+    setSortedColumn(columnName);
+    setSortDirection(newDirection);
+
+    onChange(playlist.items, columnName, newDirection);
+  };
+
   return (
     <DndContext
       sensors={sensors}
       onDragEnd={({ active, over }) => {
-        if (!over) return; // No hubo cambio de orden
+        if (!over) return;
 
         const activeIndex = playlist.items.findIndex(
           ({ id }) => id === active.id
         );
         const overIndex = playlist.items.findIndex(({ id }) => id === over.id);
 
-        onChange(arrayMove(playlist.items, activeIndex, overIndex));
+        onDrag(arrayMove(playlist.items, activeIndex, overIndex));
       }}
     >
       <SortableContext
@@ -50,9 +74,24 @@ export function PlaylistTable({ playlist, onChange }: PlaylistTableProps) {
         <table>
           <thead>
             <tr>
-              <th>Artistas</th>
-              <th>Canción</th>
-              <th>Álbum</th>
+              <th
+                style={{ cursor: 'pointer' }}
+                onClick={() => handleSort('artist')}
+              >
+                Artistas
+              </th>
+              <th
+                style={{ cursor: 'pointer' }}
+                onClick={() => handleSort('song')}
+              >
+                Canción
+              </th>
+              <th
+                style={{ cursor: 'pointer' }}
+                onClick={() => handleSort('album')}
+              >
+                Álbum
+              </th>
             </tr>
           </thead>
           <tbody>

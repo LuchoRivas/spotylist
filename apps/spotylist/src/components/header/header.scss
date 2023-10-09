@@ -1,0 +1,47 @@
+.sticky-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Centra verticalmente los elementos */
+  padding: 20px;
+  background-color: #1db954; /* Color de fondo similar a Spotify */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  transition: top 0.3s;
+  z-index: 1000;
+  position: relative;
+  color: white; /* Texto blanco */
+}
+
+.sticky-header.sticky {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.sticky-header div:first-child {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.sticky-header div:last-child {
+  display: flex;
+  align-items: center;
+  color: white; /* Texto blanco */
+  font-weight: bold;
+}
+
+.sticky-header button {
+  background-color: #1db954; /* Color de fondo del botón */
+  color: white; /* Texto blanco */
+  border: none;
+  padding: 10px 20px;
+  margin-left: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.sticky-header button:hover {
+  background-color: #179745; /* Color de fondo del botón al pasar el mouse */
+}

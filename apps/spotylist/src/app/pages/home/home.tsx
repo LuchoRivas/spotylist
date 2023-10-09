@@ -1,12 +1,18 @@
+/* eslint-disable no-eval */
 import apiClient from 'common/src/lib/api-client';
 import {
   SpotifyPlaylist,
   SpotifyTrackItem,
 } from 'common/src/lib/ts/spotify-web-api';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useAuth } from '../../auth-context';
 import { Playlist, PlaylistTrackApiResponse } from '@spotylist/common';
-import PlaylistTable from '../../..//components/playlist-table/playlist-table';
+import PlaylistTable, {
+  SortColumn,
+  SortDirection,
+} from '../../../components/playlist-table/playlist-table';
+import Header from '../../../components/header/header';
+import PlaylistGrid from '../../../components/playlist-grid/playlist-grid';
 
 function Home() {
   const { accessToken, appUser } = useAuth();
@@ -14,7 +20,6 @@ function Home() {
     null
   );
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
-  const [isHeaderSticky, setIsHeaderSticky] = useState(false);
 
   const onLoginClicked = useCallback(async () => {
     try {
@@ -83,27 +88,42 @@ function Home() {
     []
   );
 
-  const handleScroll = () => {
-    if (window.scrollY > 100) {
-      setIsHeaderSticky(true);
-    } else {
-      setIsHeaderSticky(false);
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [playlist]);
-
-  const onChangePlaylistOrder = useCallback(
+  // Playlist table logic
+  const onDragPlaylistItemOrder = useCallback(
     (orderedPlaylist: SpotifyTrackItem[]) => {
       if (!playlist) return;
       const updatedOrder: Playlist = { ...playlist, items: orderedPlaylist };
       setPlaylist(updatedOrder);
+    },
+    [playlist]
+  );
+
+  const onColumnChange = useCallback(
+    (
+      playlistItems: SpotifyTrackItem[],
+      column: SortColumn,
+      direction: SortDirection
+    ) => {
+      const columnMap = {
+        artist: 'track.artists[0].name',
+        album: 'track.album.name',
+        song: 'track.name',
+      };
+      if (!columnMap[column]) {
+        // Column no reconocida
+        return;
+      }
+      const sort = [...playlistItems].sort((a, b) => {
+        const columnA = eval(`a.${columnMap[column]}`) || '';
+        const columnB = eval(`b.${columnMap[column]}`) || '';
+
+        if (direction === 'asc') {
+          return columnA.localeCompare(columnB);
+        } else {
+          return columnB.localeCompare(columnA);
+        }
+      });
+      playlist && setPlaylist({ ...playlist, items: sort });
     },
     [playlist]
   );
@@ -126,17 +146,7 @@ function Home() {
       )}
       {accessToken && (
         <div>
-          <header className={`sticky-header${isHeaderSticky ? ' sticky' : ''}`}>
-            <div>Listofy</div>
-            <div>Hola {appUser?.display_name}</div>
-            {isHeaderSticky && (
-              <button
-                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              >
-                Volver Arriba
-              </button>
-            )}
-          </header>
+          <Header />
           <div>
             {!playlist && (
               <div>
@@ -146,35 +156,10 @@ function Home() {
               </div>
             )}
             {userPlaylists && !playlist && (
-              <div className="grid-container">
-                {userPlaylists.map((userPlaylist) => (
-                  <div
-                    className="grid-item"
-                    key={userPlaylist.id}
-                    onClick={() =>
-                      onPlaylistClicked({
-                        playlistId: userPlaylist.id,
-                        name: userPlaylist.name,
-                        imageUrl: userPlaylist.images[1]
-                          ? userPlaylist.images[1].url
-                          : userPlaylist.images[0].url,
-                      })
-                    }
-                  >
-                    <strong>{userPlaylist.name}</strong>
-                    <img
-                      src={
-                        userPlaylist.images[1]
-                          ? userPlaylist.images[1].url
-                          : userPlaylist.images[0].url
-                      }
-                      alt={`${userPlaylist.id}-pl-cover`}
-                    />
-
-                    <span>{`${userPlaylist.tracks.total} tracks`}</span>
-                  </div>
-                ))}
-              </div>
+              <PlaylistGrid
+                onClick={onPlaylistClicked}
+                userPlaylists={userPlaylists}
+              />
             )}
             {playlist && (
               <div>
@@ -187,7 +172,8 @@ function Home() {
                 <br />
                 <br />
                 <PlaylistTable
-                  onChange={onChangePlaylistOrder}
+                  onChange={onColumnChange}
+                  onDrag={onDragPlaylistItemOrder}
                   playlist={playlist}
                 />
               </div>
