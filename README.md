@@ -18,13 +18,34 @@ This is a small project I developed in my spare time to explore and test the Spo
 - **NodeJS:** Backend implementation and handling of the Spotify API.
 
 
+## Installation and Running
+1. Clone this repository.
+2. Install dependencies with npm install or yarn install.
+3. Configure your Spotify API credentials.
+4. To start the frontend, run `npm run start-front`. Open your browser and navigate to http://localhost:3000/
+5. To start the backend, run `npm run start-back`.
 
 
+## Setting Up Spotify API Credentials
+1. Go to the [Spotify Developer Dashboard](https://developer.spotify.com/documentation/web-api).
+2. Log in and navigate to the dashboard.
+3. Click on the **"Create App"** button to create a new app.
+4. Configure the Redirect URIs by adding the following:
+  - `http://localhost:3000/callback`
+  - `http://localhost:3000`
+5. Once the app is created, note down the Client ID and Client Secret.
 
-## Start the app
-
-To start the development server run `nx serve spotylist`. Open your browser and navigate to http://localhost:4200/. Happy coding!
-
+## Environment File (.env) / Miscellaneous Notes
+Create a `.env` file at the root level of the monorepo with the following content:
+```
+CLIENT_ID=<your_client_id>
+API_BASE_URL=http://localhost:4000
+BASE_URL=http://localhost:3000
+CLIENT_SECRET=<your_client_secret>
+PORT=4000
+```
+### Notes:
+It's important that the API runs on port 4000. I couldn't manage to use the environment file (`common/src/lib/api-client.ts`).
 
 ## Generate code
 
