@@ -2,8 +2,11 @@ import apiClient, { setAuthTokenHeader } from 'common/src/lib/api-client';
 import { useCallback } from 'react';
 import { useAuth } from '../../auth-context';
 import { SpotifyResponse } from '@spotylist/common';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 function useCallbackLogic() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const { setAccessToken, setRefreshToken, setAppUser } = useAuth();
 
   const fetchDataFromAPI = useCallback(
@@ -29,7 +32,29 @@ function useCallbackLogic() {
     [setAccessToken, setRefreshToken, setAppUser]
   );
 
-  return { fetchDataFromAPI };
+  const accessTokenExchange = () => {
+    const searchParams = new URLSearchParams(location.search);
+    const code = searchParams.get('code');
+    const state = searchParams.get('state');
+
+    if (code && state) {
+      fetchDataFromAPI(code, state)
+        .then((res) => {
+          navigate('/');
+        })
+        .catch((err) => {
+          console.log('fetchDataFromAPI error', err);
+          navigate('/404');
+        })
+        .finally();
+    } else {
+      console.error(
+        'Los parámetros "code" y/o "state" no están presentes en la URL.'
+      );
+    }
+  };
+
+  return { accessTokenExchange };
 }
 
 export default useCallbackLogic;
