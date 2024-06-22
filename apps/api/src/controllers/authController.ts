@@ -1,30 +1,38 @@
 import { Request, Response } from 'express';
 import querystring from 'querystring';
 import request from 'request';
-import { clientId, clientSecret, redirectUri, spotifyAPIBaseUrl } from '../config/config';
+import {
+  clientId,
+  clientSecret,
+  redirectUri,
+  spotifyAPIBaseUrl,
+} from '../config/config';
 import { generateRandomString } from '../utils/utils';
 
-export const login = (req: Request, res: Response) => {
+export function Login(req: Request, res: Response) {
   const state = generateRandomString(16);
-  const scope = 'user-read-private user-read-email playlist-read-private playlist-read-collaborative';
+  const scope =
+    'user-read-private user-read-email playlist-read-private playlist-read-collaborative';
 
   try {
-    const authUrl = `https://accounts.spotify.com/authorize?${querystring.stringify({
-      response_type: 'code',
-      client_id: clientId,
-      scope: scope,
-      redirect_uri: redirectUri,
-      state: state,
-    })}`;
+    const authUrl = `https://accounts.spotify.com/authorize?${querystring.stringify(
+      {
+        response_type: 'code',
+        client_id: clientId,
+        scope: scope,
+        redirect_uri: redirectUri,
+        state: state,
+      }
+    )}`;
 
     res.json({ authUrl });
   } catch (error) {
     res.status(500).json({ Error: error });
     console.error(error);
   }
-};
+}
 
-export const callback = (req: Request, res: Response) => {
+export function Callback(req: Request, res: Response) {
   const { code, state } = req.query || null;
 
   if (state === null) {
@@ -38,7 +46,9 @@ export const callback = (req: Request, res: Response) => {
         grant_type: 'authorization_code',
       },
       headers: {
-        Authorization: 'Basic ' + Buffer.from(clientId + ':' + clientSecret).toString('base64'),
+        Authorization:
+          'Basic ' +
+          Buffer.from(clientId + ':' + clientSecret).toString('base64'),
       },
       json: true,
     };
@@ -70,14 +80,15 @@ export const callback = (req: Request, res: Response) => {
       }
     });
   }
-};
+}
 
-export const refreshToken = (req: Request, res: Response) => {
+export function RefreshToken(req: Request, res: Response) {
   const { refresh_token } = req.query;
   const authOptions = {
     url: 'https://accounts.spotify.com/api/token',
     headers: {
-      Authorization: 'Basic ' + new Buffer(clientId + ':' + clientSecret).toString('base64'),
+      Authorization:
+        'Basic ' + new Buffer(clientId + ':' + clientSecret).toString('base64'),
     },
     form: {
       grant_type: 'refresh_token',
@@ -92,4 +103,4 @@ export const refreshToken = (req: Request, res: Response) => {
       res.send({ access_token: access_token });
     }
   });
-};
+}

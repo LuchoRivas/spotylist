@@ -1,10 +1,10 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import request from 'request';
 import { spotifyAPIBaseUrl } from '../config/config';
 import { filterUserPlaylists } from '../utils/utils';
 import { SpotifyPlaylist, SpotifyPlaylistResponse, SpotifyPlaylistTrackResponse, SpotifyTrackItem } from '@spotylist/common';
 
-export const getUserPlaylists = (req: any, res: Response) => {
+export function GetUserPlaylists(req: any, res: Response) {
   const { userId } = req.query || '';
   const limit = 50;
   let offset = 0;
@@ -40,7 +40,7 @@ export const getUserPlaylists = (req: any, res: Response) => {
   fetchPlaylists();
 };
 
-export const getPlaylistTracks = (req: any, res: Response) => {
+export function GetPlaylistTracks(req: any, res: Response) {
   const { playlistId } = req.query || '';
   let offset = 0;
   const allPlaylistTracks: SpotifyTrackItem[] = [];

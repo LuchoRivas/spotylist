@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { getUserPlaylists, getPlaylistTracks } from '../controllers/playlistController';
+import { GetPlaylistTracks, GetUserPlaylists } from '../controllers/playlistController';
 
 const router = Router();
 
-router.get('/user-playlists', getUserPlaylists);
-router.get('/playlist-tracks', getPlaylistTracks);
+router.get('/user-playlists', GetUserPlaylists);
+router.get('/playlist-tracks', GetPlaylistTracks);
 
 export default router;

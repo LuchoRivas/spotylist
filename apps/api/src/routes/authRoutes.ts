@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { login, callback, refreshToken } from '../controllers/authController';
+import { Login, Callback, RefreshToken } from '../controllers/authController';
 
 const router = Router();
 
-router.get('/login', login);
-router.get('/callback', callback);
-router.get('/refresh_token', refreshToken);
+router.get('/login', Login);
+router.get('/callback', Callback);
+router.get('/refresh_token', RefreshToken);
 
 export default router;
