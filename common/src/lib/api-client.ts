@@ -1,9 +1,10 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
-// Crear una instancia de Axios
-const apiClient: AxiosInstance = axios.create({
-  baseURL: 'http://localhost:4000', // TODO: Proveer desde environment
-});
+const apiClient: AxiosInstance = axios.create();
+
+export const initApiClient = (baseURL: string) => {
+  apiClient.defaults.baseURL = baseURL;
+};
 
 export const setAuthTokenHeader = (token: string | null) => {
   if (token) {
