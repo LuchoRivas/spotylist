@@ -18,13 +18,12 @@ export async function playlistTracks(req: Request, res: Response) {
   const authorization = req.headers.authorization as string;
 
   const tracksData = await getPlaylistTracks(playlistId, authorization);
-
-  const mappedItems: SpotifyTrackItem[] = tracksData.items.map(
-    (playlistItem, index) => ({
+  const mappedItems: SpotifyTrackItem[] = tracksData.items
+    .filter((playlistItem) => playlistItem.track !== null)
+    .map((playlistItem, index) => ({
       ...playlistItem,
       id: `track_${playlistItem.track.id}${index}`,
-    })
-  );
+    }));
 
   const { total, next, href } = tracksData;
   res.json({ items: mappedItems, total, next, href });
