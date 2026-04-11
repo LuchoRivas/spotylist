@@ -1,128 +1,20 @@
-import { useCallback, useState } from 'react';
-import {
-  apiClient,
-  Playlist,
-  PlaylistTrackApiResponse,
-  SpotifyPlaylist,
-  SpotifyTrackItem,
-} from '@spotylist/common';
-import { useAuth } from '../../auth-context';
-import PlaylistTable, {
-  SortColumn,
-  SortDirection,
-} from '../../../components/playlist-table/playlist-table';
+import PlaylistTable from '../../../components/playlist-table/playlist-table';
 import Header from '../../../components/header/header';
 import PlaylistGrid from '../../../components/playlist-grid/playlist-grid';
+import { useHome } from './home.logic';
 
 function Home() {
-  const { accessToken, appUser } = useAuth();
-  const [userPlaylists, setUserPlaylists] = useState<SpotifyPlaylist[] | null>(
-    null
-  );
-  const [playlist, setPlaylist] = useState<Playlist | null>(null);
-
-  const onLoginClicked = useCallback(async () => {
-    try {
-      const resp = await apiClient.get('login');
-      if (resp.status === 200) {
-        const { authUrl }: { authUrl: string } = await resp.data;
-        if (authUrl) window.location.href = authUrl;
-      } else {
-        console.log('Error en la respuesta del servidor');
-      }
-    } catch (error) {
-      console.log('Error:', error);
-    }
-  }, []);
-
-  const onLoadMyPlaylistsClicked = async () => {
-    if (!accessToken || !appUser) return;
-    apiClient
-      .get('user-playlists', { params: { userId: appUser.id } })
-      .then(async (response: any) => {
-        if (response.status === 200) {
-          const { playlists } = await response.data;
-          setUserPlaylists(playlists);
-        } else {
-          console.log('Error en la respuesta del servidor');
-        }
-      })
-      .catch((reject: any) => {
-        console.log('rejected(user-playlists)', reject);
-      });
-  };
-
-  const onPlaylistClicked = useCallback(
-    ({
-      playlistId,
-      name,
-      imageUrl,
-    }: {
-      playlistId: string;
-      name: string;
-      imageUrl: string;
-    }) => {
-      apiClient
-        .get('playlist-tracks', { params: { playlistId } })
-        .then(async (response: any) => {
-          if (response.status === 200) {
-            const { items, total, next, href } =
-              (await response.data) as PlaylistTrackApiResponse;
-            setPlaylist({
-              items,
-              total,
-              next,
-              href,
-              playlistId,
-              name,
-              imageUrl,
-            });
-          } else {
-            console.log('Error en la respuesta del servidor');
-          }
-        })
-        .catch((reject: any) => {
-          console.log('rejected(playlist-tracks)', reject);
-        });
-    },
-    []
-  );
-
-  // Playlist table logic
-  const onDragPlaylistItemOrder = useCallback(
-    (orderedPlaylist: SpotifyTrackItem[]) => {
-      if (!playlist) return;
-      const updatedOrder: Playlist = { ...playlist, items: orderedPlaylist };
-      setPlaylist(updatedOrder);
-    },
-    [playlist]
-  );
-
-  const onColumnChange = useCallback(
-    (
-      playlistItems: SpotifyTrackItem[],
-      column: SortColumn,
-      direction: SortDirection
-    ) => {
-      const columnAccessor: Record<SortColumn, (item: SpotifyTrackItem) => string> = {
-        artist: (item) => item.track.artists[0]?.name || '',
-        album: (item) => item.track.album.name || '',
-        song: (item) => item.track.name || '',
-      };
-      const getValue = columnAccessor[column];
-      if (!getValue) return;
-
-      const sort = [...playlistItems].sort((a, b) => {
-        const columnA = getValue(a);
-        const columnB = getValue(b);
-        return direction === 'asc'
-          ? columnA.localeCompare(columnB)
-          : columnB.localeCompare(columnA);
-      });
-      playlist && setPlaylist({ ...playlist, items: sort });
-    },
-    [playlist]
-  );
+  const {
+    accessToken,
+    userPlaylists,
+    playlist,
+    onLoginClicked,
+    onLoadMyPlaylistsClicked,
+    onPlaylistClicked,
+    onDragPlaylistItemOrder,
+    onColumnChange,
+    onClearPlaylist,
+  } = useHome();
 
   return (
     <div>
@@ -161,8 +53,7 @@ function Home() {
               <div>
                 <h3>{playlist.name}</h3>
                 <br />
-
-                <button className="button" onClick={() => setPlaylist(null)}>
+                <button className="button" onClick={onClearPlaylist}>
                   volver
                 </button>
                 <br />
