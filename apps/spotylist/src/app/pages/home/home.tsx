@@ -1,4 +1,3 @@
-/* eslint-disable no-eval */
 import apiClient from 'common/src/lib/api-client';
 import {
   SpotifyPlaylist,
@@ -104,24 +103,20 @@ function Home() {
       column: SortColumn,
       direction: SortDirection
     ) => {
-      const columnMap = {
-        artist: 'track.artists[0].name',
-        album: 'track.album.name',
-        song: 'track.name',
+      const columnAccessor: Record<SortColumn, (item: SpotifyTrackItem) => string> = {
+        artist: (item) => item.track.artists[0]?.name || '',
+        album: (item) => item.track.album.name || '',
+        song: (item) => item.track.name || '',
       };
-      if (!columnMap[column]) {
-        // Column no reconocida
-        return;
-      }
-      const sort = [...playlistItems].sort((a, b) => {
-        const columnA = eval(`a.${columnMap[column]}`) || '';
-        const columnB = eval(`b.${columnMap[column]}`) || '';
+      const getValue = columnAccessor[column];
+      if (!getValue) return;
 
-        if (direction === 'asc') {
-          return columnA.localeCompare(columnB);
-        } else {
-          return columnB.localeCompare(columnA);
-        }
+      const sort = [...playlistItems].sort((a, b) => {
+        const columnA = getValue(a);
+        const columnB = getValue(b);
+        return direction === 'asc'
+          ? columnA.localeCompare(columnB)
+          : columnB.localeCompare(columnA);
       });
       playlist && setPlaylist({ ...playlist, items: sort });
     },
