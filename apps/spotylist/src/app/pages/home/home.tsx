@@ -1,11 +1,12 @@
-import apiClient from 'common/src/lib/api-client';
+import { useCallback, useState } from 'react';
 import {
+  apiClient,
+  Playlist,
+  PlaylistTrackApiResponse,
   SpotifyPlaylist,
   SpotifyTrackItem,
-} from 'common/src/lib/ts/spotify-web-api';
-import { useCallback, useState } from 'react';
+} from '@spotylist/common';
 import { useAuth } from '../../auth-context';
-import { Playlist, PlaylistTrackApiResponse } from '@spotylist/common';
 import PlaylistTable, {
   SortColumn,
   SortDirection,

@@ -1,6 +1,5 @@
-import { SpotifyUser } from '@spotylist/common';
+import { SpotifyUser, apiClient, setAuthTokenHeader } from '@spotylist/common';
 import { AxiosResponse } from 'axios';
-import apiClient, { setAuthTokenHeader } from 'common/src/lib/api-client';
 import React, {
   createContext,
   useContext,
