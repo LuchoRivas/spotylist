@@ -1,5 +1,4 @@
-import { setAuthTokenHeader, SpotifyResponse } from '@spotylist/common';
-import apiClient from 'common/src/lib/api-client';
+import { apiClient, setAuthTokenHeader, SpotifyResponse } from '@spotylist/common';
 import { useCallback, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth-context';

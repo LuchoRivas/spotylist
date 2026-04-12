@@ -1,10 +1,14 @@
 import { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { initApiClient } from '@spotylist/common';
+import { environment } from './environments/environment';
 import { AuthProvider } from './app/auth-context';
 import Callback from './app/pages/callback/callback';
 import Home from './app/pages/home/home';
 import Error from './app/pages/error/error';
+
+initApiClient(environment.baseURL);
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

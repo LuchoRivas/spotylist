@@ -3,7 +3,10 @@
 dist
 tmp
 node_modules
+.nx
 npm-debug.log
 yarn-error.log
 testem.log
 .env
+# claudio
+CLAUDE.md

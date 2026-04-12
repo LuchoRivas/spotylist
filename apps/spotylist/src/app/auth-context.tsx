@@ -1,6 +1,5 @@
-import { SpotifyUser } from '@spotylist/common';
+import { SpotifyUser, apiClient, setAuthTokenHeader } from '@spotylist/common';
 import { AxiosResponse } from 'axios';
-import apiClient, { setAuthTokenHeader } from 'common/src/lib/api-client';
 import React, {
   createContext,
   useContext,
@@ -46,17 +45,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, []);
 
-  // Utilizamos useEffect para almacenar los tokens en sessionStorage cuando cambian.
+  // Persistir tokens en sessionStorage cuando cambian.
   useEffect(() => {
     if (accessToken && refreshToken) {
       sessionStorage.setItem('access_token', accessToken);
       sessionStorage.setItem('refresh_token', refreshToken);
       sessionStorage.setItem('app_user', JSON.stringify(appUser));
     }
-    apiClient.interceptors.response.use(
+  }, [accessToken, refreshToken, appUser]);
+
+  // Registrar interceptor una sola vez al montar.
+  useEffect(() => {
+    const interceptorId = apiClient.interceptors.response.use(
       (response: AxiosResponse) => response,
       async (error) => {
-        if (error.response && error.response.status === 401) {
+        if (error.response && error.response.status === 401 && !error.config._retry) {
           error.config._retry = true;
           const refresh_token = sessionStorage.getItem('refresh_token');
           const { data, status } = await apiClient.get('refresh_token', {
@@ -66,18 +69,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
             const { access_token } = data;
             setAccessTokenStore(access_token);
             setAuthTokenHeader(access_token);
-            apiClient.defaults.headers.common[
-              'Authorization'
-            ] = `Bearer ${access_token}`;
             error.config.headers['Authorization'] = `Bearer ${access_token}`;
-            setAccessToken(access_token);
           }
           return apiClient(error.config);
         }
         return Promise.reject(error);
       }
     );
-  }, [accessToken, refreshToken, appUser]);
+
+    return () => {
+      apiClient.interceptors.response.eject(interceptorId);
+    };
+  }, []);
 
   const setAccessToken = (token: string | null) => {
     sessionStorage.setItem('access_token', token || 'null');

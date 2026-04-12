@@ -53,6 +53,7 @@
       "options": {
         "buildTarget": "spotylist:build",
         "hmr": true,
+        "host": "127.0.0.1",
         "port": 3000
       },
       "configurations": {
@@ -66,7 +67,7 @@
       }
     },
     "lint": {
-      "executor": "@nx/linter:eslint",
+      "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["apps/spotylist/**/*.{ts,tsx,js,jsx}"]
